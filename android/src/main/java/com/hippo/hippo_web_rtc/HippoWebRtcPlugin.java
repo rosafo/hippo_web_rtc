@@ -61,7 +61,6 @@ import io.flutter.embedding.engine.plugins.lifecycle.HiddenLifecycleReference;
 import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.EventChannel;
 import io.flutter.plugin.common.MethodChannel;
-import io.flutter.plugin.common.PluginRegistry.Registrar;
 import io.flutter.view.TextureRegistry;
 
 /**
@@ -81,26 +80,6 @@ public class HippoWebRtcPlugin implements FlutterPlugin, ActivityAware, EventCha
   public EventChannel.EventSink eventSink;
 
   public HippoWebRtcPlugin() {
-  }
-
-  /**
-   * Plugin registration.
-   */
-  public static void registerWith(Registrar registrar) {
-    final HippoWebRtcPlugin plugin = new HippoWebRtcPlugin();
-
-    plugin.startListening(registrar.context(), registrar.messenger(), registrar.textures());
-
-    if (registrar.activeContext() instanceof Activity) {
-      plugin.methodCallHandler.setActivity((Activity) registrar.activeContext());
-    }
-    application = ((Application) registrar.context().getApplicationContext());
-    application.registerActivityLifecycleCallbacks(plugin.observer);
-
-    registrar.addViewDestroyListener(view -> {
-      plugin.stopListening();
-      return false;
-    });
   }
 
   @Override

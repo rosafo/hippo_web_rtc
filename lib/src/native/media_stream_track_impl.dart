@@ -55,25 +55,21 @@ class MediaStreamTrackNative extends MediaStreamTrack {
         <String, dynamic>{'trackId': _trackId},
       ).then((value) => value ?? false);
 
-  @override
   Future<bool> isZoomSupported() => WebRTC.invokeMethod(
         'isZoomSupported',
         <String, dynamic>{'trackId': _trackId},
       ).then((value) => value ?? false);
 
-  @override
   Future<void> setZoom(int value) => WebRTC.invokeMethod(
         'setZoom',
         <String, dynamic>{'trackId': _trackId, 'zoom': value},
       );
 
-  @override
   Future<int> getZoom() => WebRTC.invokeMethod(
         'getZoom',
         <String, dynamic>{'trackId': _trackId},
       ).then((value) => value ?? 1);
 
-  @override
   Future<int> setZoom1() {
     print('setZoom1 called');
     return WebRTC.invokeMethod(
@@ -82,7 +78,6 @@ class MediaStreamTrackNative extends MediaStreamTrack {
     ).then((value) => value ?? 1);
   }
 
-  @override
   Future<int> setZoom2() {
     print('setZoom2 called');
     return WebRTC.invokeMethod(
@@ -91,7 +86,6 @@ class MediaStreamTrackNative extends MediaStreamTrack {
     ).then((value) => value ?? 1);
   }
 
-  @override
   Future<int> setZoom3() {
     print('setZoom3 called');
     return WebRTC.invokeMethod(
@@ -100,7 +94,6 @@ class MediaStreamTrackNative extends MediaStreamTrack {
     ).then((value) => value ?? 1);
   }
 
-  @override
   Future<int> setZoom4() {
     print('setZoom4 called');
     return WebRTC.invokeMethod(
@@ -109,7 +102,6 @@ class MediaStreamTrackNative extends MediaStreamTrack {
     ).then((value) => value ?? 1);
   }
 
-  @override
   Future<int> setZoom5() {
     print('setZoom5 called');
     return WebRTC.invokeMethod(
@@ -118,7 +110,6 @@ class MediaStreamTrackNative extends MediaStreamTrack {
     ).then((value) => value ?? 1);
   }
 
-  @override
   Future<int> getMaxZoom() => WebRTC.invokeMethod(
         'getMaxZoom',
         <String, dynamic>{'trackId': _trackId},
@@ -130,19 +121,16 @@ class MediaStreamTrackNative extends MediaStreamTrack {
         <String, dynamic>{'trackId': _trackId, 'torch': torch},
       );
 
-  @override
   Future<bool> setLightOn() => WebRTC.invokeMethod(
         'setLightOn',
         <String, dynamic>{'trackId': _trackId},
       ).then((value) => value ?? false);
 
-  @override
   Future<bool> setLightOff() => WebRTC.invokeMethod(
         'setLightOff',
         <String, dynamic>{'trackId': _trackId},
       ).then((value) => value ?? false);
 
-  @override
   Future<bool> getLightStatus() => WebRTC.invokeMethod(
         'getLightStatus',
         <String, dynamic>{'trackId': _trackId},
@@ -150,37 +138,31 @@ class MediaStreamTrackNative extends MediaStreamTrack {
 
   //=================================================================
 
-  @override
   Future<int> turnLightOn() => WebRTC.invokeMethod(
         'turnLightOn',
         <String, dynamic>{'trackId': _trackId},
       ).then((value) => value ?? 100);
 
-  @override
   Future<int> turnLightOn1(int a) => WebRTC.invokeMethod(
         'turnLightOn',
         <String, dynamic>{'trackId': _trackId, 'a': a},
       ).then((value) => value ?? 100);
 
-  @override
   Future<int> turnLightOff() => WebRTC.invokeMethod(
         'turnLightOn',
         <String, dynamic>{'trackId': _trackId},
       ).then((value) => value ?? 100);
 
-  @override
   Future<int> turnLightOff1(int a) => WebRTC.invokeMethod(
         'turnLightOn',
         <String, dynamic>{'trackId': _trackId, 'a': a},
       ).then((value) => value ?? 100);
 
-  @override
   Future<int> turnLightStatus() => WebRTC.invokeMethod(
         'turnLightOn',
         <String, dynamic>{'trackId': _trackId},
       ).then((value) => value ?? 100);
 
-  @override
   Future<int> turnLightStatus1(int a) => WebRTC.invokeMethod(
         'turnLightOn',
         <String, dynamic>{'trackId': _trackId, 'a': a},

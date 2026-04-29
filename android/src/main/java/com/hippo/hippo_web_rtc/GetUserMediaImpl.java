@@ -915,14 +915,30 @@ class GetUserMediaImpl {
                 Object session =
                         getPrivateProperty(
                                 Camera2Capturer.class.getSuperclass(), info.capturer, "currentSession");
+                if (session == null) {
+                    result.success(false);
+                    return;
+                }
                 manager =
                         (CameraManager)
                                 getPrivateProperty(Camera2Capturer.class, info.capturer, "cameraManager");
+                if (manager == null) {
+                    result.success(false);
+                    return;
+                }
                 cameraDevice =
                         (CameraDevice) getPrivateProperty(session.getClass(), session, "cameraDevice");
+                if (cameraDevice == null) {
+                    result.success(false);
+                    return;
+                }
             } catch (NoSuchFieldWithNameException e) {
                 // Most likely the upstream Camera2Capturer class have changed
                 resultError("hasTorch", "[TORCH] Failed to get `" + e.fieldName + "` from `" + e.className + "`", result);
+                return;
+            } catch (Exception e) {
+                Log.w(TAG, "[TORCH] hasTorch Camera2 fallback false", e);
+                result.success(false);
                 return;
             }
 
@@ -932,8 +948,13 @@ class GetUserMediaImpl {
                         manager.getCameraCharacteristics(cameraDevice.getId());
                 flashIsAvailable = characteristics.get(CameraCharacteristics.FLASH_INFO_AVAILABLE);
             } catch (CameraAccessException e) {
-                // Should never happen since we are already accessing the camera
-                throw new RuntimeException(e);
+                Log.w(TAG, "[TORCH] Camera access error during hasTorch", e);
+                result.success(false);
+                return;
+            } catch (Exception e) {
+                Log.w(TAG, "[TORCH] Unexpected Camera2 hasTorch error", e);
+                result.success(false);
+                return;
             }
 
             result.success(flashIsAvailable);
@@ -947,15 +968,35 @@ class GetUserMediaImpl {
                 Object session =
                         getPrivateProperty(
                                 Camera1Capturer.class.getSuperclass(), info.capturer, "currentSession");
+                if (session == null) {
+                    result.success(false);
+                    return;
+                }
                 camera = (Camera) getPrivateProperty(session.getClass(), session, "camera");
+                if (camera == null) {
+                    result.success(false);
+                    return;
+                }
             } catch (NoSuchFieldWithNameException e) {
                 // Most likely the upstream Camera1Capturer class have changed
                 resultError("hasTorch", "[TORCH] Failed to get `" + e.fieldName + "` from `" + e.className + "`", result);
                 return;
+            } catch (Exception e) {
+                Log.w(TAG, "[TORCH] hasTorch Camera1 fallback false", e);
+                result.success(false);
+                return;
             }
 
-            Parameters params = camera.getParameters();
-            List<String> supportedModes = params.getSupportedFlashModes();
+            Parameters params;
+            List<String> supportedModes;
+            try {
+                params = camera.getParameters();
+                supportedModes = params != null ? params.getSupportedFlashModes() : null;
+            } catch (Exception e) {
+                Log.w(TAG, "[TORCH] Camera1 getParameters failed", e);
+                result.success(false);
+                return;
+            }
 
             result.success(
                     (supportedModes == null) ? false : supportedModes.contains(Parameters.FLASH_MODE_TORCH));

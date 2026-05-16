@@ -483,11 +483,20 @@ class RTCPeerConnectionNative extends RTCPeerConnection {
   @override
   Future<RTCRtpSender> addTrack(MediaStreamTrack track,
       [MediaStream? stream]) async {
+    final trackId = track.id;
+    if (trackId == null || trackId.isEmpty) {
+      throw 'Unable to RTCPeerConnection::addTrack: invalid track id';
+    }
     try {
+      final streamIds = <String>[];
+      final streamId = stream?.id;
+      if (streamId != null && streamId.isNotEmpty) {
+        streamIds.add(streamId);
+      }
       final response = await WebRTC.invokeMethod('addTrack', <String, dynamic>{
         'peerConnectionId': _peerConnectionId,
-        'trackId': track.id,
-        'streamIds': [stream?.id]
+        'trackId': trackId,
+        'streamIds': streamIds
       });
       return RTCRtpSenderNative.fromMap(response,
           peerConnectionId: _peerConnectionId);

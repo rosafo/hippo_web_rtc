@@ -1015,25 +1015,30 @@ class GetUserMediaImpl {
         }
 
         if (VERSION.SDK_INT >= VERSION_CODES.LOLLIPOP && info.capturer instanceof Camera2Capturer) {
-            CameraManager manager;
-            CameraDevice cameraDevice;
             Log.i("isZoomableT",   " isZoomable for Camera2Capturer done" );
-            //return;
             try {
                 Object session =
                         getPrivateProperty(
                                 Camera2Capturer.class.getSuperclass(), info.capturer, "currentSession");
+                if (session == null) {
+                    result.success(false);
+                    return;
+                }
                 Log.i(TAG, session.getClass().getName() + " => session.getClass().getName()");
 
                 try {
                     isZoomable = (boolean) callPrivateFunction(session.getClass(), session, "isZoomSupported") ;
                     Log.i(TAG,   " isZoomable => " + isZoomable);
-                } catch (Exception ignored){}
-
-
+                } catch (Exception ignored) {
+                    isZoomable = false;
+                }
             } catch (NoSuchFieldWithNameException e) {
                 // Most likely the upstream Camera2Capturer class have changed
-                resultError("hasTorch", "[TORCH] Failed to get `" + e.fieldName + "` from `" + e.className + "`", result);
+                resultError("isZoomSupported", "[isZoomable] Failed to get `" + e.fieldName + "` from `" + e.className + "`", result);
+                return;
+            } catch (Exception e) {
+                Log.w(TAG, "[isZoomable] Camera2 fallback false", e);
+                result.success(false);
                 return;
             }
 
@@ -1048,15 +1053,33 @@ class GetUserMediaImpl {
                 Object session =
                         getPrivateProperty(
                                 Camera1Capturer.class.getSuperclass(), info.capturer, "currentSession");
+                if (session == null) {
+                    result.success(false);
+                    return;
+                }
                 camera = (Camera) getPrivateProperty(session.getClass(), session, "camera");
+                if (camera == null) {
+                    result.success(false);
+                    return;
+                }
             } catch (NoSuchFieldWithNameException e) {
                 // Most likely the upstream Camera1Capturer class have changed
                 resultError("isZoomSupported", "[isZoomable] Failed to get `" + e.fieldName + "` from `" + e.className + "`", result);
                 return;
+            } catch (Exception e) {
+                Log.w(TAG, "[isZoomable] Camera1 fallback false", e);
+                result.success(false);
+                return;
             }
 
-            Parameters params = camera.getParameters();
-            isZoomable = params.isZoomSupported();
+            try {
+                Parameters params = camera.getParameters();
+                isZoomable = params != null && params.isZoomSupported();
+            } catch (Exception e) {
+                Log.w(TAG, "[isZoomable] Camera1 getParameters failed", e);
+                result.success(false);
+                return;
+            }
            // List<String> supportedModes = params.getSupportedFlashModes();
 
             result.success(isZoomable);

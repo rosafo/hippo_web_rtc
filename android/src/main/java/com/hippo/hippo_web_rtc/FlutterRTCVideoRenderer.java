@@ -54,8 +54,13 @@ public class FlutterRTCVideoRenderer implements EventChannel.StreamHandler {
                 ConstraintsMap params = new ConstraintsMap();
                 params.putString("event", "didFirstFrameRendered");
                 params.putInt("id", id);
-                if (eventSink != null) {
-                    eventSink.success(params.toMap());
+                final EventChannel.EventSink sink = eventSink;
+                if (sink != null) {
+                    try {
+                        sink.success(params.toMap());
+                    } catch (Exception e) {
+                        Log.w(TAG, "Dropping first-frame event after renderer detach", e);
+                    }
                 }
             }
 
@@ -64,7 +69,8 @@ public class FlutterRTCVideoRenderer implements EventChannel.StreamHandler {
                     int videoWidth, int videoHeight,
                     int rotation) {
 
-                if (eventSink != null) {
+                final EventChannel.EventSink sink = eventSink;
+                if (sink != null) {
                     if (_width != videoWidth || _height != videoHeight) {
                         ConstraintsMap params = new ConstraintsMap();
                         params.putString("event", "didTextureChangeVideoSize");
@@ -73,7 +79,11 @@ public class FlutterRTCVideoRenderer implements EventChannel.StreamHandler {
                         params.putDouble("height", (double) videoHeight);
                         _width = videoWidth;
                         _height = videoHeight;
-                        eventSink.success(params.toMap());
+                        try {
+                            sink.success(params.toMap());
+                        } catch (Exception e) {
+                            Log.w(TAG, "Dropping video-size event after renderer detach", e);
+                        }
                     }
 
                     if (_rotation != rotation) {
@@ -82,7 +92,11 @@ public class FlutterRTCVideoRenderer implements EventChannel.StreamHandler {
                         params2.putInt("id", id);
                         params2.putInt("rotation", rotation);
                         _rotation = rotation;
-                        eventSink.success(params2.toMap());
+                        try {
+                            sink.success(params2.toMap());
+                        } catch (Exception e) {
+                            Log.w(TAG, "Dropping rotation event after renderer detach", e);
+                        }
                     }
                 }
             }

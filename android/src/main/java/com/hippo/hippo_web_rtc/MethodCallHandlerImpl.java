@@ -1875,14 +1875,22 @@ public class MethodCallHandlerImpl implements MethodCallHandler, StateProvider {
 
   public void addTrack(String peerConnectionId, String trackId, List<String> streamIds, Result result) {
     PeerConnectionObserver pco = mPeerConnectionObservers.get(peerConnectionId);
-    MediaStreamTrack track = localTracks.get(trackId);
+    if (trackId == null || trackId.isEmpty()) {
+      resultError("addTrack", "trackId is null or empty", result);
+      return;
+    }
+    MediaStreamTrack track = getTrackForId(trackId);
     if (track == null) {
-      resultError("addTrack", "track is null", result);
+      resultError("addTrack", "track is null for id: " + trackId, result);
       return;
     }
     if (pco == null || pco.getPeerConnection() == null) {
       resultError("addTrack", "peerConnection is null", result);
     } else {
+      if (streamIds == null) {
+        streamIds = new ArrayList<>();
+      }
+      streamIds.removeIf(id -> id == null || id.isEmpty());
       pco.addTrack(track, streamIds, result);
     }
   }
